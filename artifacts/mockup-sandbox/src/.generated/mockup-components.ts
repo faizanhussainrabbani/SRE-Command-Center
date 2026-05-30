@@ -4,5 +4,6 @@ export const modules: ModuleMap = {
   "./components/mockups/sre-dashboard/AgentStatus.tsx": () => import("../components/mockups/sre-dashboard/AgentStatus.tsx"),
   "./components/mockups/sre-dashboard/Dashboard.tsx": () => import("../components/mockups/sre-dashboard/Dashboard.tsx"),
   "./components/mockups/sre-dashboard/IncidentDetail.tsx": () => import("../components/mockups/sre-dashboard/IncidentDetail.tsx"),
+  "./components/mockups/sre-dashboard/Retrospective.tsx": () => import("../components/mockups/sre-dashboard/Retrospective.tsx"),
   "./components/mockups/sre-dashboard/RunbookPlanner.tsx": () => import("../components/mockups/sre-dashboard/RunbookPlanner.tsx")
 };
