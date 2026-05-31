@@ -16,7 +16,7 @@ import {
   type Incident,
 } from "@workspace/db";
 import { asc, desc, eq, sql } from "drizzle-orm";
-import { sendNotFound, sendValidated } from "./response-helpers";
+import { parseOrSendValidationError, sendNotFound, sendValidated } from "./response-helpers";
 
 const router: IRouter = Router();
 
@@ -152,7 +152,15 @@ async function toIncidentSummary(incident: Incident) {
 }
 
 router.get("/v1/incidents", async (req, res) => {
-  const query = ListIncidentsQueryParams.parse(req.query);
+  const query = parseOrSendValidationError(
+    res,
+    ListIncidentsQueryParams,
+    req.query,
+    "Invalid incident list query parameters.",
+  );
+  if (!query) {
+    return;
+  }
   const whereClause = query.status
     ? eq(incidentsTable.status, query.status)
     : sql`true`;
@@ -181,7 +189,15 @@ router.get("/v1/incidents", async (req, res) => {
 });
 
 router.get("/v1/incidents/:id", async (req, res) => {
-  const params = GetIncidentByIdParams.parse(req.params);
+  const params = parseOrSendValidationError(
+    res,
+    GetIncidentByIdParams,
+    req.params,
+    "Invalid incident id.",
+  );
+  if (!params) {
+    return;
+  }
 
   const incidents = await db
     .select()
@@ -241,7 +257,15 @@ router.get("/v1/incidents/:id", async (req, res) => {
 });
 
 router.get("/v1/incidents/:id/timeline", async (req, res) => {
-  const params = GetIncidentTimelineParams.parse(req.params);
+  const params = parseOrSendValidationError(
+    res,
+    GetIncidentTimelineParams,
+    req.params,
+    "Invalid incident id for timeline request.",
+  );
+  if (!params) {
+    return;
+  }
 
   const incidents = await db
     .select({ incidentId: incidentsTable.incidentId })

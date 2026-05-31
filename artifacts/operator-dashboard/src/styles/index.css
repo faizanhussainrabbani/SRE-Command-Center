@@ -1,0 +1,274 @@
+:root {
+  color: #122539;
+  background:
+    radial-gradient(1200px 500px at -5% -15%, rgba(255, 196, 117, 0.35) 0%, transparent 60%),
+    radial-gradient(1000px 420px at 120% -10%, rgba(134, 239, 172, 0.32) 0%, transparent 62%),
+    linear-gradient(180deg, #f4f9ff 0%, #eef6fb 65%, #e9f4f1 100%);
+  font-family: "IBM Plex Sans", "Segoe UI", sans-serif;
+  line-height: 1.5;
+  --surface: rgba(255, 255, 255, 0.92);
+  --surface-strong: #ffffff;
+  --border: rgba(18, 37, 57, 0.14);
+  --text-muted: #4f657a;
+  --badge-outline-bg: rgba(19, 76, 123, 0.08);
+  --ok: #14532d;
+  --ok-bg: rgba(34, 197, 94, 0.15);
+  --warn: #92400e;
+  --warn-bg: rgba(251, 191, 36, 0.2);
+  --danger: #991b1b;
+  --danger-bg: rgba(239, 68, 68, 0.16);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+}
+
+#root {
+  min-height: 100vh;
+}
+
+a {
+  color: #0f3d6e;
+}
+
+.app-shell {
+  min-height: 100vh;
+  padding: 1.5rem;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.app-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.app-nav {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.app-main {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 0.75rem;
+  padding: 1rem;
+  backdrop-filter: blur(4px);
+}
+
+.error-state {
+  margin: 2rem;
+  padding: 1rem;
+  border-radius: 0.5rem;
+  border: 1px solid #dc2626;
+  background: #fef2f2;
+}
+
+.dashboard-grid {
+  display: grid;
+  gap: 1rem;
+}
+
+.stack-sm {
+  display: grid;
+  gap: 0.5rem;
+}
+
+.stack-md {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.card {
+  border: 1px solid var(--border);
+  border-radius: 0.75rem;
+  background: var(--surface-strong);
+  overflow: hidden;
+}
+
+.card-header {
+  padding: 1rem 1rem 0.35rem;
+  display: grid;
+  gap: 0.3rem;
+}
+
+.card-title {
+  margin: 0;
+  font-size: 1.05rem;
+}
+
+.card-description {
+  margin: 0;
+  color: var(--text-muted);
+  font-size: 0.92rem;
+}
+
+.card-content {
+  padding: 0.75rem 1rem 1rem;
+}
+
+.link-list {
+  margin: 0;
+  padding-left: 1.2rem;
+  display: grid;
+  gap: 0.35rem;
+}
+
+.text-meta {
+  margin: 0.5rem 0 0;
+  color: var(--text-muted);
+  font-size: 0.9rem;
+}
+
+.realtime-banner {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin-bottom: 0.75rem;
+}
+
+.realtime-banner-message {
+  color: var(--text-muted);
+  font-size: 0.85rem;
+}
+
+.chip-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 0.75rem;
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 999px;
+  padding: 0.2rem 0.6rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+  border: 1px solid transparent;
+}
+
+.badge-default {
+  color: #11345a;
+  background: rgba(147, 197, 253, 0.2);
+}
+
+.badge-outline {
+  border-color: rgba(17, 52, 90, 0.28);
+  color: #11345a;
+  background: var(--badge-outline-bg);
+}
+
+.badge-ok {
+  color: var(--ok);
+  background: var(--ok-bg);
+}
+
+.badge-warn {
+  color: var(--warn);
+  background: var(--warn-bg);
+}
+
+.badge-danger {
+  color: var(--danger);
+  background: var(--danger-bg);
+}
+
+.table-wrap {
+  width: 100%;
+  overflow-x: auto;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+}
+
+.table-row {
+  border-bottom: 1px solid rgba(18, 37, 57, 0.1);
+}
+
+.table-head,
+.table-cell {
+  text-align: left;
+  padding: 0.55rem 0.4rem;
+}
+
+.table-head {
+  color: var(--text-muted);
+  font-weight: 600;
+  font-size: 0.8rem;
+}
+
+.empty-state {
+  border: 1px dashed rgba(18, 37, 57, 0.28);
+  border-radius: 0.6rem;
+  padding: 1rem;
+  text-align: center;
+  background: rgba(255, 255, 255, 0.7);
+}
+
+.empty-state h4 {
+  margin: 0 0 0.35rem;
+}
+
+.empty-state p {
+  margin: 0;
+  color: var(--text-muted);
+}
+
+.meta-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 0.65rem;
+}
+
+.meta-grid dt {
+  color: var(--text-muted);
+  font-size: 0.82rem;
+}
+
+.meta-grid dd {
+  margin: 0.15rem 0 0;
+  font-weight: 600;
+  word-break: break-word;
+}
+
+.kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 0.65rem;
+}
+
+.kpi-grid dt {
+  color: var(--text-muted);
+  font-size: 0.84rem;
+}
+
+.kpi-grid dd {
+  margin: 0.2rem 0 0;
+  font-size: 1.2rem;
+  font-weight: 700;
+}
+
+@media (max-width: 700px) {
+  .app-shell {
+    padding: 0.8rem;
+  }
+
+  .app-main {
+    padding: 0.75rem;
+  }
+}

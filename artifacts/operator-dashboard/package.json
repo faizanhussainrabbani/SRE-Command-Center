@@ -1,0 +1,32 @@
+{
+  "name": "@workspace/operator-dashboard",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite dev",
+    "build": "vite build",
+    "preview": "vite preview",
+    "lint": "pnpm run lint:boundaries && pnpm run typecheck",
+    "lint:boundaries": "node ./scripts/lint-import-boundaries.mjs",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "tsx ./scripts/run-tests.ts"
+  },
+  "dependencies": {
+    "@tanstack/react-query": "catalog:",
+    "@workspace/api-client-react": "workspace:*",
+    "react": "catalog:",
+    "react-dom": "catalog:",
+    "wouter": "catalog:"
+  },
+  "devDependencies": {
+    "@tailwindcss/vite": "catalog:",
+    "@types/node": "catalog:",
+    "@types/react": "catalog:",
+    "@types/react-dom": "catalog:",
+    "@vitejs/plugin-react": "catalog:",
+    "tailwindcss": "catalog:",
+    "tsx": "catalog:",
+    "vite": "catalog:"
+  }
+}

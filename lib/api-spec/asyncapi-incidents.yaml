@@ -1,0 +1,141 @@
+asyncapi: 2.6.0
+id: urn:workspace:sre-command-center:incidents-stream
+info:
+  title: SRE Command Center Incident Stream
+  version: 1.0.0
+  description: AsyncAPI contract for operator dashboard websocket updates.
+defaultContentType: application/json
+servers:
+  local:
+    host: localhost:8081
+    protocol: ws
+    description: Local API server websocket endpoint
+channels:
+  /api/ws/incidents:
+    description: Incident snapshot and update stream for operator dashboard clients.
+    subscribe:
+      operationId: subscribeIncidents
+      summary: Subscribe to incident stream updates
+      message:
+        oneOf:
+          - $ref: '#/components/messages/IncidentInitialState'
+          - $ref: '#/components/messages/IncidentUpdate'
+components:
+  messages:
+    IncidentInitialState:
+      name: IncidentInitialState
+      title: Initial state snapshot
+      payload:
+        $ref: '#/components/schemas/IncidentStreamInitialState'
+    IncidentUpdate:
+      name: IncidentUpdate
+      title: Incremental incident update
+      payload:
+        $ref: '#/components/schemas/IncidentStreamUpdate'
+  schemas:
+    IncidentSummary:
+      type: object
+      properties:
+        incidentId:
+          type: string
+          format: uuid
+        service:
+          type: string
+        severity:
+          type: string
+        status:
+          type: string
+        phase:
+          type: string
+        openedAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+        closedAt:
+          type: string
+          format: date-time
+          nullable: true
+        provider:
+          type: string
+        computeMechanism:
+          type: string
+        resourceId:
+          type: string
+        latestConfidence:
+          type: number
+          nullable: true
+        elapsedSeconds:
+          type: integer
+          minimum: 0
+        version:
+          type: integer
+          minimum: 0
+      required:
+        - incidentId
+        - service
+        - severity
+        - status
+        - phase
+        - openedAt
+        - updatedAt
+        - closedAt
+        - provider
+        - computeMechanism
+        - resourceId
+        - latestConfidence
+        - elapsedSeconds
+        - version
+    IncidentStreamInitialState:
+      type: object
+      properties:
+        type:
+          type: string
+          enum: [initial_state]
+        sequence:
+          type: integer
+          minimum: 1
+        resyncToken:
+          type: string
+          format: date-time
+        pollIntervalMs:
+          type: integer
+          minimum: 250
+        at:
+          type: string
+          format: date-time
+        incidents:
+          type: array
+          items:
+            $ref: '#/components/schemas/IncidentSummary'
+      required:
+        - type
+        - sequence
+        - resyncToken
+        - pollIntervalMs
+        - at
+        - incidents
+    IncidentStreamUpdate:
+      type: object
+      properties:
+        type:
+          type: string
+          enum: [incident_update]
+        sequence:
+          type: integer
+          minimum: 1
+        resyncToken:
+          type: string
+          format: date-time
+        at:
+          type: string
+          format: date-time
+        incident:
+          $ref: '#/components/schemas/IncidentSummary'
+      required:
+        - type
+        - sequence
+        - resyncToken
+        - at
+        - incident

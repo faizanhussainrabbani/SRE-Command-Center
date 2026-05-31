@@ -153,9 +153,20 @@ pnpm --filter @workspace/mockup-sandbox run dev
 
 Vite runs the UI sandbox for mockup and dashboard iteration.
 
-### 3. Open the App
+### 3. Start the Operator Dashboard
+
+In a third terminal:
+
+```bash
+pnpm --filter @workspace/operator-dashboard run dev
+```
+
+This package is the production runtime path for incident operations and remains contract-bound to Node endpoints.
+
+### 4. Open the App
 
 * Frontend sandbox: <http://localhost:5173>
+* Operator dashboard: <http://localhost:5174>
 * API base path: <http://localhost:5000/api>
 * Swagger UI: <http://localhost:5000/docs>
 
@@ -185,6 +196,13 @@ Expected WebSocket message types:
 * `incident_update`
 
 ## Development Workflows
+
+### Sandbox vs Operator Dashboard
+
+Use the sandbox and operator dashboard for different purposes:
+
+* `@workspace/mockup-sandbox`: design previews and rapid visual exploration
+* `@workspace/operator-dashboard`: production workflow implementation with Node API-only boundaries
 
 ### Type Checking
 
