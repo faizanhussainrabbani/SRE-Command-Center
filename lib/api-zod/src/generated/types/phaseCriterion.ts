@@ -6,6 +6,11 @@
  * OpenAPI spec version: 0.1.0
  */
 
-export interface HealthStatus {
+export interface PhaseCriterion {
+  key: string;
+  label: string;
+  current: number;
+  target: number;
+  unit: string;
   status: string;
 }

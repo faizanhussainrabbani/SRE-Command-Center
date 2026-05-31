@@ -10,6 +10,10 @@ servers:
 tags:
   - name: health
     description: Health operations
+  - name: incidents
+    description: Incident dashboard operations
+  - name: dashboard
+    description: Dashboard summary operations
 paths:
   /healthz:
     get:
@@ -24,7 +28,117 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/HealthStatus"
+  /v1/incidents:
+    get:
+      operationId: listIncidents
+      tags: [incidents]
+      summary: List incidents
+      description: Returns a paginated list of incidents for the operator dashboard.
+      parameters:
+        - in: query
+          name: limit
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 200
+            default: 50
+        - in: query
+          name: offset
+          schema:
+            type: integer
+            minimum: 0
+            default: 0
+        - in: query
+          name: status
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Incident list
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/IncidentListResponse"
+  /v1/incidents/{id}:
+    get:
+      operationId: getIncidentById
+      tags: [incidents]
+      summary: Get incident detail
+      description: Returns detailed information for a single incident.
+      parameters:
+        - $ref: "#/components/parameters/IncidentId"
+      responses:
+        "200":
+          description: Incident detail
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/IncidentDetailResponse"
+        "404":
+          description: Incident not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+  /v1/incidents/{id}/timeline:
+    get:
+      operationId: getIncidentTimeline
+      tags: [incidents]
+      summary: Get incident timeline
+      description: Returns the event timeline for a single incident.
+      parameters:
+        - $ref: "#/components/parameters/IncidentId"
+      responses:
+        "200":
+          description: Incident timeline
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/IncidentTimelineResponse"
+        "404":
+          description: Incident not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+  /v1/phases/status:
+    get:
+      operationId: getPhaseStatus
+      tags: [dashboard]
+      summary: Get current phase status
+      description: Returns current rollout phase and graduation progress.
+      responses:
+        "200":
+          description: Current phase status
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PhaseStatusResponse"
+  /v1/accuracy/summary:
+    get:
+      operationId: getAccuracySummary
+      tags: [dashboard]
+      summary: Get dashboard accuracy summary
+      description: >-
+        Returns dashboard KPI aggregates with mixed windows: diagnostic accuracy
+        uses a trailing 7-day window, while auto-resolved, pending approvals,
+        and MTTR use trailing 24-hour semantics.
+      responses:
+        "200":
+          description: Accuracy summary
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AccuracySummaryResponse"
 components:
+  parameters:
+    IncidentId:
+      in: path
+      name: id
+      required: true
+      schema:
+        type: string
+        format: uuid
   schemas:
     HealthStatus:
       type: object
@@ -33,4 +147,371 @@ components:
           type: string
       required:
         - status
+    ErrorResponse:
+      type: object
+      properties:
+        code:
+          type: string
+        message:
+          type: string
+      required:
+        - code
+        - message
+    IncidentSummary:
+      type: object
+      properties:
+        incidentId:
+          type: string
+          format: uuid
+        service:
+          type: string
+        severity:
+          type: string
+        status:
+          type: string
+        phase:
+          type: string
+        openedAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+        closedAt:
+          type: string
+          format: date-time
+          nullable: true
+        provider:
+          type: string
+        computeMechanism:
+          type: string
+        resourceId:
+          type: string
+        latestConfidence:
+          type: number
+          nullable: true
+        elapsedSeconds:
+          type: integer
+          minimum: 0
+        version:
+          type: integer
+          minimum: 0
+      required:
+        - incidentId
+        - service
+        - severity
+        - status
+        - phase
+        - openedAt
+        - updatedAt
+        - closedAt
+        - provider
+        - computeMechanism
+        - resourceId
+        - latestConfidence
+        - elapsedSeconds
+        - version
+    IncidentListResponse:
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/IncidentSummary"
+        total:
+          type: integer
+          minimum: 0
+        limit:
+          type: integer
+          minimum: 1
+        offset:
+          type: integer
+          minimum: 0
+      required:
+        - items
+        - total
+        - limit
+        - offset
+    EvidenceReference:
+      type: object
+      properties:
+        source:
+          type: string
+        title:
+          type: string
+        uri:
+          type: string
+          nullable: true
+        snippet:
+          type: string
+          nullable: true
+      additionalProperties: true
+      required:
+        - source
+        - title
+        - uri
+        - snippet
+    DiagnosisSnapshot:
+      type: object
+      properties:
+        diagnosisId:
+          type: string
+          format: uuid
+        diagnosisSummary:
+          type: string
+        confidenceScore:
+          type: number
+        generatedAt:
+          type: string
+          format: date-time
+        modelName:
+          type: string
+        evidenceRefs:
+          type: array
+          items:
+            $ref: "#/components/schemas/EvidenceReference"
+      required:
+        - diagnosisId
+        - diagnosisSummary
+        - confidenceScore
+        - generatedAt
+        - modelName
+        - evidenceRefs
+    RemediationActionSummary:
+      type: object
+      properties:
+        actionId:
+          type: string
+          format: uuid
+        actionType:
+          type: string
+        actionStatus:
+          type: string
+        approvalMode:
+          type: string
+        requestedAt:
+          type: string
+          format: date-time
+        startedAt:
+          type: string
+          format: date-time
+          nullable: true
+        completedAt:
+          type: string
+          format: date-time
+          nullable: true
+        rollbackActionId:
+          type: string
+          format: uuid
+          nullable: true
+        executionResult:
+          type: object
+          nullable: true
+          additionalProperties: true
+      required:
+        - actionId
+        - actionType
+        - actionStatus
+        - approvalMode
+        - requestedAt
+        - startedAt
+        - completedAt
+        - rollbackActionId
+        - executionResult
+    IncidentDetailResponse:
+      type: object
+      properties:
+        incident:
+          $ref: "#/components/schemas/IncidentSummary"
+        latestDiagnosis:
+          anyOf:
+            - $ref: "#/components/schemas/DiagnosisSnapshot"
+            - type: 'null'
+        remediationActions:
+          type: array
+          items:
+            $ref: "#/components/schemas/RemediationActionSummary"
+      required:
+        - incident
+        - latestDiagnosis
+        - remediationActions
+    IncidentTimelineEvent:
+      type: object
+      properties:
+        eventId:
+          type: string
+          format: uuid
+        incidentId:
+          type: string
+          format: uuid
+        eventType:
+          type: string
+        occurredAt:
+          type: string
+          format: date-time
+        provider:
+          type: string
+        computeMechanism:
+          type: string
+        resourceId:
+          type: string
+        correlationKey:
+          type: string
+          nullable: true
+        idempotencyKey:
+          type: string
+        payload:
+          type: object
+          additionalProperties: true
+      required:
+        - eventId
+        - incidentId
+        - eventType
+        - occurredAt
+        - provider
+        - computeMechanism
+        - resourceId
+        - correlationKey
+        - idempotencyKey
+        - payload
+    IncidentTimelineResponse:
+      type: object
+      properties:
+        incidentId:
+          type: string
+          format: uuid
+        events:
+          type: array
+          items:
+            $ref: "#/components/schemas/IncidentTimelineEvent"
+      required:
+        - incidentId
+        - events
+    PhaseCriterion:
+      type: object
+      properties:
+        key:
+          type: string
+        label:
+          type: string
+        current:
+          type: number
+        target:
+          type: number
+        unit:
+          type: string
+        status:
+          type: string
+      required:
+        - key
+        - label
+        - current
+        - target
+        - unit
+        - status
+    PhaseStatusResponse:
+      type: object
+      properties:
+        currentPhase:
+          type: string
+        asOf:
+          type: string
+          format: date-time
+        graduationCriteria:
+          type: array
+          items:
+            $ref: "#/components/schemas/PhaseCriterion"
+      required:
+        - currentPhase
+        - asOf
+        - graduationCriteria
+    AccuracySummaryResponse:
+      type: object
+      properties:
+        windowStart:
+          type: string
+          format: date-time
+          description: Inclusive start of the trailing 7-day diagnostic accuracy window.
+        windowEnd:
+          type: string
+          format: date-time
+          description: End timestamp used for both diagnostic and trailing 24-hour operational KPI windows.
+        diagnosticAccuracy7d:
+          type: number
+          description: Ratio of diagnosis results with confidence >= 0.85 over the trailing 7 days.
+        autoResolvedCount:
+          type: integer
+          minimum: 0
+          description: Count of incidents auto-resolved over the trailing 24 hours.
+        pendingApprovals:
+          type: integer
+          minimum: 0
+          description: Count of pending manual approvals requested over the trailing 24 hours.
+        mttrMinutes:
+          type: number
+          description: Mean time to resolution in minutes for resolved incidents over the trailing 24 hours.
+      required:
+        - windowStart
+        - windowEnd
+        - diagnosticAccuracy7d
+        - autoResolvedCount
+        - pendingApprovals
+        - mttrMinutes
+    IncidentStreamInitialState:
+      type: object
+      properties:
+        type:
+          type: string
+          enum: [initial_state]
+        sequence:
+          type: integer
+          minimum: 1
+          description: Monotonic sequence number. Clients should treat any sequence gap as a signal to reconnect and resync.
+        resyncToken:
+          type: string
+          format: date-time
+          description: Cursor token representing server snapshot time for reconnect/resync handling.
+        pollIntervalMs:
+          type: integer
+          minimum: 250
+          description: Server polling cadence used for update checks.
+        at:
+          type: string
+          format: date-time
+        incidents:
+          type: array
+          items:
+            $ref: "#/components/schemas/IncidentSummary"
+      required:
+        - type
+        - sequence
+        - resyncToken
+        - pollIntervalMs
+        - at
+        - incidents
+    IncidentStreamUpdate:
+      type: object
+      properties:
+        type:
+          type: string
+          enum: [incident_update]
+        sequence:
+          type: integer
+          minimum: 1
+          description: Monotonic sequence number. If sequence does not increase by exactly one, clients should reconnect and rebuild state from initial_state.
+        resyncToken:
+          type: string
+          format: date-time
+          description: Cursor token for this update timestamp.
+        at:
+          type: string
+          format: date-time
+        incident:
+          $ref: "#/components/schemas/IncidentSummary"
+      required:
+        - type
+        - sequence
+        - resyncToken
+        - at
+        - incident
 
