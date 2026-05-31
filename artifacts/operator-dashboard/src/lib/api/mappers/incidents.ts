@@ -58,15 +58,19 @@ export type IncidentListViewModel = {
 };
 
 export function mapIncidentListResponse(response: IncidentListResponse): IncidentListViewModel {
+  const items = asArray<IncidentSummary>((response as { items?: unknown }).items).map(mapIncidentSummary);
   return {
-    items: response.items.map(mapIncidentSummary),
-    total: response.total,
-    limit: response.limit,
-    offset: response.offset,
+    items,
+    total: normalizeCount((response as { total?: unknown }).total, items.length),
+    limit: normalizeCount((response as { limit?: unknown }).limit, items.length),
+    offset: normalizeCount((response as { offset?: unknown }).offset, 0),
   };
 }
 
 export function mapIncidentDetailResponse(response: IncidentDetailResponse): IncidentDetailViewModel {
+  const remediationActions = asArray<unknown>(
+    (response as { remediationActions?: unknown }).remediationActions,
+  );
   return {
     incident: mapIncidentSummary(response.incident),
     latestDiagnosis: response.latestDiagnosis
@@ -77,16 +81,19 @@ export function mapIncidentDetailResponse(response: IncidentDetailResponse): Inc
           generatedAtLabel: formatTimestamp(response.latestDiagnosis.generatedAt),
         }
       : null,
-    remediationCount: response.remediationActions.length,
+    remediationCount: remediationActions.length,
   };
 }
 
 export function mapIncidentTimelineResponse(
   response: IncidentTimelineResponse,
 ): IncidentTimelineViewModel {
+  const events = asArray<IncidentTimelineEvent>((response as { events?: unknown }).events).map(
+    mapIncidentTimelineEvent,
+  );
   return {
     incidentId: response.incidentId,
-    events: response.events.map(mapIncidentTimelineEvent),
+    events,
   };
 }
 
@@ -168,4 +175,12 @@ function toTitleCase(value: string): string {
     .filter(Boolean)
     .map((token) => token[0].toUpperCase() + token.slice(1).toLowerCase())
     .join(" ");
+}
+
+function asArray<T>(value: unknown): T[] {
+  return Array.isArray(value) ? (value as T[]) : [];
+}
+
+function normalizeCount(value: unknown, fallback: number): number {
+  return typeof value === "number" && Number.isFinite(value) ? value : fallback;
 }

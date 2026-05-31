@@ -35,6 +35,17 @@ export async function runIncidentsSuite(): Promise<void> {
   assert.equal(mappedList.items[0].phaseLabel, "Diagnosing");
   assert.equal(mappedList.items[0].latestConfidenceLabel, "92.0%");
 
+  const malformedListResponse = {
+    total: 0,
+    limit: 50,
+    offset: 0,
+  } as IncidentListResponse;
+  const mappedMalformedList = mapIncidentListResponse(malformedListResponse);
+  assert.deepEqual(mappedMalformedList.items, []);
+  assert.equal(mappedMalformedList.total, 0);
+  assert.equal(mappedMalformedList.limit, 50);
+  assert.equal(mappedMalformedList.offset, 0);
+
   const detailResponse: IncidentDetailResponse = {
     incident: listResponse.items[0],
     latestDiagnosis: {

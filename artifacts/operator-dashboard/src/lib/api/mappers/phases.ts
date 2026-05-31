@@ -25,31 +25,39 @@ export type AccuracySummaryViewModel = {
 };
 
 export function mapPhaseStatusResponse(response: PhaseStatusResponse): PhaseStatusViewModel {
+  const currentPhase = asString((response as { currentPhase?: unknown }).currentPhase, "UNKNOWN");
+  const criteria = asArray<PhaseCriterion>((response as { graduationCriteria?: unknown }).graduationCriteria)
+    .map(mapPhaseCriterion);
+
   return {
-    currentPhase: response.currentPhase,
-    currentPhaseLabel: normalizePhaseLabel(response.currentPhase),
-    asOfLabel: formatTimestamp(response.asOf),
-    graduationCriteria: response.graduationCriteria.map(mapPhaseCriterion),
+    currentPhase,
+    currentPhaseLabel: normalizePhaseLabel(currentPhase),
+    asOfLabel: formatTimestamp(asString((response as { asOf?: unknown }).asOf, "")),
+    graduationCriteria: criteria,
   };
 }
 
 export function mapAccuracySummaryResponse(response: AccuracySummaryResponse): AccuracySummaryViewModel {
+  const mttrMinutes = asNumber((response as { mttrMinutes?: unknown }).mttrMinutes, 0);
   return {
-    windowStartLabel: formatTimestamp(response.windowStart),
-    windowEndLabel: formatTimestamp(response.windowEnd),
-    diagnosticAccuracyLabel: formatRatio(response.diagnosticAccuracy7d),
-    autoResolvedCount: response.autoResolvedCount,
-    pendingApprovals: response.pendingApprovals,
-    mttrMinutesLabel: `${response.mttrMinutes.toFixed(1)} min`,
+    windowStartLabel: formatTimestamp(asString((response as { windowStart?: unknown }).windowStart, "")),
+    windowEndLabel: formatTimestamp(asString((response as { windowEnd?: unknown }).windowEnd, "")),
+    diagnosticAccuracyLabel: formatRatio(
+      asNumber((response as { diagnosticAccuracy7d?: unknown }).diagnosticAccuracy7d, 0),
+    ),
+    autoResolvedCount: asNumber((response as { autoResolvedCount?: unknown }).autoResolvedCount, 0),
+    pendingApprovals: asNumber((response as { pendingApprovals?: unknown }).pendingApprovals, 0),
+    mttrMinutesLabel: `${mttrMinutes.toFixed(1)} min`,
   };
 }
 
 function mapPhaseCriterion(criterion: PhaseCriterion): PhaseCriterionViewModel {
+  const unit = asString((criterion as { unit?: unknown }).unit, "count");
   return {
-    key: criterion.key,
-    label: criterion.label,
-    currentLabel: formatCriterionValue(criterion.current, criterion.unit),
-    targetLabel: formatCriterionValue(criterion.target, criterion.unit),
+    key: asString((criterion as { key?: unknown }).key, "unknown"),
+    label: asString((criterion as { label?: unknown }).label, "Unknown criterion"),
+    currentLabel: formatCriterionValue(asNumber((criterion as { current?: unknown }).current, 0), unit),
+    targetLabel: formatCriterionValue(asNumber((criterion as { target?: unknown }).target, 0), unit),
     status: criterion.status === "met" ? "met" : "not_met",
   };
 }
@@ -68,7 +76,8 @@ function formatCriterionValue(value: number, unit: string): string {
 }
 
 function normalizePhaseLabel(phase: string): string {
-  switch (phase.toUpperCase()) {
+  const normalizedPhase = asString(phase, "UNKNOWN");
+  switch (normalizedPhase.toUpperCase()) {
     case "OBSERVE":
       return "Observe";
     case "ASSIST":
@@ -76,7 +85,7 @@ function normalizePhaseLabel(phase: string): string {
     case "AUTONOMOUS":
       return "Autonomous";
     default:
-      return phase;
+      return normalizedPhase;
   }
 }
 
@@ -89,5 +98,18 @@ function formatTimestamp(value: string): string {
 }
 
 function formatRatio(value: number): string {
-  return `${(value * 100).toFixed(1)}%`;
+  const normalized = Number.isFinite(value) ? value : 0;
+  return `${(normalized * 100).toFixed(1)}%`;
+}
+
+function asArray<T>(value: unknown): T[] {
+  return Array.isArray(value) ? (value as T[]) : [];
+}
+
+function asString(value: unknown, fallback: string): string {
+  return typeof value === "string" ? value : fallback;
+}
+
+function asNumber(value: unknown, fallback: number): number {
+  return typeof value === "number" && Number.isFinite(value) ? value : fallback;
 }

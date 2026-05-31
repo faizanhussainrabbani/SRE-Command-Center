@@ -30,6 +30,19 @@ export async function runAccuracySuite(): Promise<void> {
   assert.equal(mappedPhase.currentPhaseLabel, "Assist");
   assert.equal(mappedPhase.graduationCriteria[0].currentLabel, "91.0%");
 
+  const malformedPhaseResponse = {
+    asOf: "2026-05-31T10:00:00.000Z",
+    graduationCriteria: [],
+  } as PhaseStatusResponse;
+  const mappedMalformedPhase = mapPhaseStatusResponse(malformedPhaseResponse);
+  assert.equal(mappedMalformedPhase.currentPhaseLabel, "UNKNOWN");
+  assert.equal(mappedMalformedPhase.graduationCriteria.length, 0);
+
+  const htmlPayload = "<!DOCTYPE html><html><body>fallback</body></html>" as unknown as PhaseStatusResponse;
+  const mappedHtmlPhase = mapPhaseStatusResponse(htmlPayload);
+  assert.equal(mappedHtmlPhase.currentPhaseLabel, "UNKNOWN");
+  assert.equal(mappedHtmlPhase.graduationCriteria.length, 0);
+
   const accuracyResponse: AccuracySummaryResponse = {
     windowStart: "2026-05-24T00:00:00.000Z",
     windowEnd: "2026-05-31T00:00:00.000Z",

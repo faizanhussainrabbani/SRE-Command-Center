@@ -27,6 +27,11 @@ export async function runIncidentsFeedSuite(): Promise<void> {
   const cached = selectIncidentListViewModel(response);
   assert.equal(cached, viewModel, "selector should memoize by response reference");
 
+  const htmlPayload = "<!DOCTYPE html><html><body>fallback</body></html>" as unknown as IncidentListResponse;
+  const malformedViewModel = selectIncidentListViewModel(htmlPayload);
+  assert.equal(malformedViewModel.items.length, 0);
+  assert.equal(malformedViewModel.total, 0);
+
   assert.equal(ROUTES.incidents, "/incidents");
   assert.equal(ROUTES.incidentDetail, "/incidents/:incidentId");
 }
