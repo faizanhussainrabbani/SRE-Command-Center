@@ -157,6 +157,7 @@ Vite runs the UI sandbox for mockup and dashboard iteration.
 
 * Frontend sandbox: <http://localhost:5173>
 * API base path: <http://localhost:5000/api>
+* Swagger UI: <http://localhost:5000/docs>
 
 ## API and Real-Time Endpoints
 
@@ -168,6 +169,11 @@ Key HTTP endpoints:
 * `GET /api/v1/incidents/{id}/timeline`
 * `GET /api/v1/phases/status`
 * `GET /api/v1/accuracy/summary`
+
+OpenAPI document and docs UI:
+
+* `/openapi.yaml`
+* `/docs`
 
 WebSocket endpoint:
 
