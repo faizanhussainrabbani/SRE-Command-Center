@@ -19,10 +19,15 @@ export function PhaseStatusPanel() {
         {phaseQuery.isError ? <p role="alert">Unable to load phase status data.</p> : null}
         {phaseView ? (
           <div className="stack-md">
-            <div className="chip-row">
-              <span className="text-meta">Current phase</span>
-              <Badge variant="outline">{phaseView.currentPhaseLabel}</Badge>
-              <span className="text-meta">As of {phaseView.asOfLabel}</span>
+            <div className="status-list">
+              <div className="status-item">
+                <span className="status-item-label">Current phase gate</span>
+                <span className="status-item-value">{phaseView.currentPhaseLabel}</span>
+              </div>
+              <div className="status-item">
+                <span className="status-item-label">Snapshot time</span>
+                <span className="status-item-value">{phaseView.asOfLabel}</span>
+              </div>
             </div>
             <Table>
               <TableHeader>

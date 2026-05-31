@@ -40,21 +40,24 @@ export function IncidentDetailPage({ params }: IncidentDetailPageProps) {
   }
 
   return (
-    <section className="dashboard-grid">
+    <section className="dashboard-grid-single">
       <Card>
         <CardHeader>
-          <CardTitle>{detailView.incident.service}</CardTitle>
-          <CardDescription>Incident {detailView.incident.incidentId}</CardDescription>
+          <CardTitle>Incident command detail</CardTitle>
+          <CardDescription>Deep-dive timeline and diagnosis trace for active incident handling.</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="chip-row">
+            <Link href="/incidents">Back to feed</Link>
+            <Badge variant={severityVariant(detailView.incident.severity)}>{detailView.incident.severity}</Badge>
             <Badge variant="outline">{detailView.incident.phaseLabel}</Badge>
-            <Badge variant={severityVariant(detailView.incident.severity)}>
-              {detailView.incident.severity}
-            </Badge>
             <Badge variant="default">{detailView.incident.statusLabel}</Badge>
           </div>
-          <dl className="meta-grid">
+          <h2 className="card-title" style={{ marginTop: "0.35rem" }}>
+            {detailView.incident.service} / {detailView.incident.incidentId.slice(0, 12)}
+          </h2>
+          <p className="text-meta">Opened {detailView.incident.openedAtLabel} / Elapsed {detailView.incident.elapsedLabel}</p>
+          <dl className="meta-grid" style={{ marginTop: "0.8rem" }}>
             <div>
               <dt>Provider</dt>
               <dd>{detailView.incident.provider}</dd>
@@ -68,35 +71,67 @@ export function IncidentDetailPage({ params }: IncidentDetailPageProps) {
               <dd>{detailView.incident.resourceId}</dd>
             </div>
             <div>
-              <dt>Opened</dt>
-              <dd>{detailView.incident.openedAtLabel}</dd>
+              <dt>Last updated</dt>
+              <dd>{detailView.incident.updatedAtLabel}</dd>
             </div>
           </dl>
         </CardContent>
       </Card>
 
-      <Card>
-        <CardHeader>
-          <CardTitle>Latest diagnosis</CardTitle>
-        </CardHeader>
-        <CardContent>
-          {detailView.latestDiagnosis ? (
-            <div className="stack-sm">
-              <p>{detailView.latestDiagnosis.diagnosisSummary}</p>
-              <p className="text-meta">
-                Confidence: {detailView.latestDiagnosis.confidenceLabel} by {detailView.latestDiagnosis.modelName}
-              </p>
-            </div>
-          ) : (
-            <EmptyState
-              title="No diagnosis snapshot"
-              description="No diagnosis has been recorded for this incident yet."
-            />
-          )}
-        </CardContent>
-      </Card>
+      <div className="dashboard-grid">
+        <div className="status-stack">
+          <Card>
+            <CardHeader>
+              <CardTitle>Diagnostic pipeline trace</CardTitle>
+              <CardDescription>Model reasoning summary and confidence output.</CardDescription>
+            </CardHeader>
+            <CardContent>
+              {detailView.latestDiagnosis ? (
+                <div className="stack-sm">
+                  <p>{detailView.latestDiagnosis.diagnosisSummary}</p>
+                  <p className="text-meta">
+                    Confidence: {detailView.latestDiagnosis.confidenceLabel} by {detailView.latestDiagnosis.modelName}
+                  </p>
+                  <p className="text-meta">Generated {detailView.latestDiagnosis.generatedAtLabel}</p>
+                  <p className="text-meta">Remediation actions linked: {detailView.remediationCount}</p>
+                </div>
+              ) : (
+                <EmptyState
+                  title="No diagnosis snapshot"
+                  description="No diagnosis has been recorded for this incident yet."
+                />
+              )}
+            </CardContent>
+          </Card>
 
-      <TimelinePanel incidentId={incidentId} />
+          <TimelinePanel incidentId={incidentId} />
+        </div>
+
+        <div className="status-stack">
+          <Card>
+            <CardHeader>
+              <CardTitle>Execution Controls</CardTitle>
+              <CardDescription>Manual review and blast radius status markers.</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="status-list">
+                <div className="status-item">
+                  <span className="status-item-label">Manual approval mode</span>
+                  <span className="status-item-value">Enabled</span>
+                </div>
+                <div className="status-item">
+                  <span className="status-item-label">Blast radius</span>
+                  <span className="status-item-value">Low</span>
+                </div>
+                <div className="status-item">
+                  <span className="status-item-label">Rollback readiness</span>
+                  <span className="status-item-value">Ready</span>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
     </section>
   );
 }
