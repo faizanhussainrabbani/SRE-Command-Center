@@ -4,6 +4,7 @@ import type {
   IncidentSummary,
   IncidentTimelineEvent,
   IncidentTimelineResponse,
+  RemediationActionSummary,
 } from "@workspace/api-client-react";
 
 export type IncidentSummaryViewModel = {
@@ -30,9 +31,27 @@ export type DiagnosisViewModel = {
   generatedAtLabel: string;
 } | null;
 
+export type RemediationActionViewModel = {
+  actionId: string;
+  actionType: string;
+  actionTypeLabel: string;
+  actionStatus: string;
+  actionStatusLabel: string;
+  approvalMode: string;
+  approvalModeLabel: string;
+  requestedAtLabel: string;
+  startedAtLabel: string | null;
+  completedAtLabel: string | null;
+  rollbackActionId: string | null;
+  hasRollback: boolean;
+  executionResult: Record<string, unknown> | null;
+  isDecidable: boolean;
+};
+
 export type IncidentDetailViewModel = {
   incident: IncidentSummaryViewModel;
   latestDiagnosis: DiagnosisViewModel;
+  remediationActions: RemediationActionViewModel[];
   remediationCount: number;
 };
 
@@ -68,9 +87,9 @@ export function mapIncidentListResponse(response: IncidentListResponse): Inciden
 }
 
 export function mapIncidentDetailResponse(response: IncidentDetailResponse): IncidentDetailViewModel {
-  const remediationActions = asArray<unknown>(
+  const remediationActions = asArray<RemediationActionSummary>(
     (response as { remediationActions?: unknown }).remediationActions,
-  );
+  ).map(mapRemediationAction);
   return {
     incident: mapIncidentSummary(response.incident),
     latestDiagnosis: response.latestDiagnosis
@@ -81,6 +100,7 @@ export function mapIncidentDetailResponse(response: IncidentDetailResponse): Inc
           generatedAtLabel: formatTimestamp(response.latestDiagnosis.generatedAt),
         }
       : null,
+    remediationActions,
     remediationCount: remediationActions.length,
   };
 }
@@ -125,6 +145,28 @@ export function mapIncidentTimelineEvent(event: IncidentTimelineEvent): Incident
     provider: event.provider,
     computeMechanism: event.computeMechanism,
     resourceId: event.resourceId,
+  };
+}
+
+const DECIDABLE_STATUSES = new Set(["pending", "requested", "awaiting_approval"]);
+
+export function mapRemediationAction(action: RemediationActionSummary): RemediationActionViewModel {
+  const normalizedStatus = (action.actionStatus ?? "").toLowerCase();
+  return {
+    actionId: action.actionId,
+    actionType: action.actionType,
+    actionTypeLabel: toTitleCase(action.actionType.replaceAll("_", " ")),
+    actionStatus: action.actionStatus,
+    actionStatusLabel: toTitleCase(action.actionStatus.replaceAll("_", " ")),
+    approvalMode: action.approvalMode,
+    approvalModeLabel: toTitleCase(action.approvalMode.replaceAll("_", " ")),
+    requestedAtLabel: formatTimestamp(action.requestedAt),
+    startedAtLabel: action.startedAt ? formatTimestamp(action.startedAt) : null,
+    completedAtLabel: action.completedAt ? formatTimestamp(action.completedAt) : null,
+    rollbackActionId: action.rollbackActionId ?? null,
+    hasRollback: action.rollbackActionId != null,
+    executionResult: (action.executionResult as Record<string, unknown>) ?? null,
+    isDecidable: DECIDABLE_STATUSES.has(normalizedStatus),
   };
 }
 

@@ -20,7 +20,7 @@ function getAllowedOrigins(): string[] {
   }
   if (!isProduction) {
     // Default dev origins — override with CORS_ORIGIN env var as needed
-    return ["http://localhost:3000", "http://localhost:5173"];
+    return ["http://localhost:3000", "http://localhost:5173", "http://localhost:5174"];
   }
   logger.warn(
     "CORS_ORIGIN is not set in production — all cross-origin requests will be blocked",

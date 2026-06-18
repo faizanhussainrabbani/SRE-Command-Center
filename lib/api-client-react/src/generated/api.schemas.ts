@@ -14,6 +14,24 @@ export interface ErrorResponse {
   message: string;
 }
 
+export interface ValidationIssue {
+  path: string;
+  message: string;
+}
+
+export type ValidationErrorResponseCode = typeof ValidationErrorResponseCode[keyof typeof ValidationErrorResponseCode];
+
+
+export const ValidationErrorResponseCode = {
+  bad_request: 'bad_request',
+} as const;
+
+export interface ValidationErrorResponse {
+  code: ValidationErrorResponseCode;
+  message: string;
+  details?: ValidationIssue[];
+}
+
 export interface IncidentSummary {
   incidentId: string;
   service: string;
@@ -179,6 +197,19 @@ export interface IncidentStreamUpdate {
   resyncToken: string;
   at: string;
   incident: IncidentSummary;
+}
+
+export type RemediationDecisionRequestDecision = typeof RemediationDecisionRequestDecision[keyof typeof RemediationDecisionRequestDecision];
+
+
+export const RemediationDecisionRequestDecision = {
+  approve: 'approve',
+  reject: 'reject',
+} as const;
+
+export interface RemediationDecisionRequest {
+  decision: RemediationDecisionRequestDecision;
+  reason?: string | null;
 }
 
 export type ListIncidentsParams = {

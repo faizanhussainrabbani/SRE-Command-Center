@@ -6,11 +6,15 @@
  * OpenAPI spec version: 0.1.0
  */
 import {
+  useMutation,
   useQuery
 } from '@tanstack/react-query';
 import type {
+  MutationFunction,
   QueryFunction,
   QueryKey,
+  UseMutationOptions,
+  UseMutationResult,
   UseQueryOptions,
   UseQueryResult
 } from '@tanstack/react-query';
@@ -23,11 +27,14 @@ import type {
   IncidentListResponse,
   IncidentTimelineResponse,
   ListIncidentsParams,
-  PhaseStatusResponse
+  PhaseStatusResponse,
+  RemediationActionSummary,
+  RemediationDecisionRequest,
+  ValidationErrorResponse
 } from './api.schemas';
 
 import { customFetch } from '../custom-fetch';
-import type { ErrorType } from '../custom-fetch';
+import type { ErrorType , BodyType } from '../custom-fetch';
 
 type AwaitedInput<T> = PromiseLike<T> | T;
 
@@ -157,7 +164,7 @@ export const getListIncidentsQueryKey = (params?: ListIncidentsParams,) => {
     }
 
 
-export const getListIncidentsQueryOptions = <TData = Awaited<ReturnType<typeof listIncidents>>, TError = ErrorType<unknown>>(params?: ListIncidentsParams, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof listIncidents>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+export const getListIncidentsQueryOptions = <TData = Awaited<ReturnType<typeof listIncidents>>, TError = ErrorType<ValidationErrorResponse>>(params?: ListIncidentsParams, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof listIncidents>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
 ) => {
 
 const {query: queryOptions, request: requestOptions} = options ?? {};
@@ -176,14 +183,14 @@ const {query: queryOptions, request: requestOptions} = options ?? {};
 }
 
 export type ListIncidentsQueryResult = NonNullable<Awaited<ReturnType<typeof listIncidents>>>
-export type ListIncidentsQueryError = ErrorType<unknown>
+export type ListIncidentsQueryError = ErrorType<ValidationErrorResponse>
 
 
 /**
  * @summary List incidents
  */
 
-export function useListIncidents<TData = Awaited<ReturnType<typeof listIncidents>>, TError = ErrorType<unknown>>(
+export function useListIncidents<TData = Awaited<ReturnType<typeof listIncidents>>, TError = ErrorType<ValidationErrorResponse>>(
  params?: ListIncidentsParams, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof listIncidents>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
 
  ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
@@ -235,7 +242,7 @@ export const getGetIncidentByIdQueryKey = (id: string,) => {
     }
 
 
-export const getGetIncidentByIdQueryOptions = <TData = Awaited<ReturnType<typeof getIncidentById>>, TError = ErrorType<ErrorResponse>>(id: string, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getIncidentById>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+export const getGetIncidentByIdQueryOptions = <TData = Awaited<ReturnType<typeof getIncidentById>>, TError = ErrorType<ValidationErrorResponse | ErrorResponse>>(id: string, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getIncidentById>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
 ) => {
 
 const {query: queryOptions, request: requestOptions} = options ?? {};
@@ -254,14 +261,14 @@ const {query: queryOptions, request: requestOptions} = options ?? {};
 }
 
 export type GetIncidentByIdQueryResult = NonNullable<Awaited<ReturnType<typeof getIncidentById>>>
-export type GetIncidentByIdQueryError = ErrorType<ErrorResponse>
+export type GetIncidentByIdQueryError = ErrorType<ValidationErrorResponse | ErrorResponse>
 
 
 /**
  * @summary Get incident detail
  */
 
-export function useGetIncidentById<TData = Awaited<ReturnType<typeof getIncidentById>>, TError = ErrorType<ErrorResponse>>(
+export function useGetIncidentById<TData = Awaited<ReturnType<typeof getIncidentById>>, TError = ErrorType<ValidationErrorResponse | ErrorResponse>>(
  id: string, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getIncidentById>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
 
  ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
@@ -313,7 +320,7 @@ export const getGetIncidentTimelineQueryKey = (id: string,) => {
     }
 
 
-export const getGetIncidentTimelineQueryOptions = <TData = Awaited<ReturnType<typeof getIncidentTimeline>>, TError = ErrorType<ErrorResponse>>(id: string, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getIncidentTimeline>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+export const getGetIncidentTimelineQueryOptions = <TData = Awaited<ReturnType<typeof getIncidentTimeline>>, TError = ErrorType<ValidationErrorResponse | ErrorResponse>>(id: string, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getIncidentTimeline>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
 ) => {
 
 const {query: queryOptions, request: requestOptions} = options ?? {};
@@ -332,14 +339,14 @@ const {query: queryOptions, request: requestOptions} = options ?? {};
 }
 
 export type GetIncidentTimelineQueryResult = NonNullable<Awaited<ReturnType<typeof getIncidentTimeline>>>
-export type GetIncidentTimelineQueryError = ErrorType<ErrorResponse>
+export type GetIncidentTimelineQueryError = ErrorType<ValidationErrorResponse | ErrorResponse>
 
 
 /**
  * @summary Get incident timeline
  */
 
-export function useGetIncidentTimeline<TData = Awaited<ReturnType<typeof getIncidentTimeline>>, TError = ErrorType<ErrorResponse>>(
+export function useGetIncidentTimeline<TData = Awaited<ReturnType<typeof getIncidentTimeline>>, TError = ErrorType<ValidationErrorResponse | ErrorResponse>>(
  id: string, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getIncidentTimeline>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
 
  ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
@@ -512,4 +519,77 @@ export function useGetAccuracySummary<TData = Awaited<ReturnType<typeof getAccur
 
 
 
+
+export const getSubmitRemediationDecisionUrl = (actionId: string,) => {
+
+
+
+
+  return `/api/v1/remediation-actions/${actionId}/decision`
+}
+
+/**
+ * Submit an operator decision (approve or reject) for a pending remediation action. Only actions with a pending approval status can be decided. On success, the parent incident version is bumped to trigger WebSocket updates.
+ * @summary Approve or reject a remediation action
+ */
+export const submitRemediationDecision = async (actionId: string,
+    remediationDecisionRequest: RemediationDecisionRequest, options?: RequestInit): Promise<RemediationActionSummary> => {
+
+  return customFetch<RemediationActionSummary>(getSubmitRemediationDecisionUrl(actionId),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      remediationDecisionRequest,)
+  }
+);}
+
+
+
+
+export const getSubmitRemediationDecisionMutationOptions = <TError = ErrorType<ValidationErrorResponse | ErrorResponse>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof submitRemediationDecision>>, TError,{actionId: string;data: BodyType<RemediationDecisionRequest>}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof submitRemediationDecision>>, TError,{actionId: string;data: BodyType<RemediationDecisionRequest>}, TContext> => {
+
+const mutationKey = ['submitRemediationDecision'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof submitRemediationDecision>>, {actionId: string;data: BodyType<RemediationDecisionRequest>}> = (props) => {
+          const {actionId,data} = props ?? {};
+
+          return  submitRemediationDecision(actionId,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type SubmitRemediationDecisionMutationResult = NonNullable<Awaited<ReturnType<typeof submitRemediationDecision>>>
+    export type SubmitRemediationDecisionMutationBody = BodyType<RemediationDecisionRequest>
+    export type SubmitRemediationDecisionMutationError = ErrorType<ValidationErrorResponse | ErrorResponse>
+
+    /**
+ * @summary Approve or reject a remediation action
+ */
+export const useSubmitRemediationDecision = <TError = ErrorType<ValidationErrorResponse | ErrorResponse>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof submitRemediationDecision>>, TError,{actionId: string;data: BodyType<RemediationDecisionRequest>}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof submitRemediationDecision>>,
+        TError,
+        {actionId: string;data: BodyType<RemediationDecisionRequest>},
+        TContext
+      > => {
+      return useMutation(getSubmitRemediationDecisionMutationOptions(options));
+    }
 

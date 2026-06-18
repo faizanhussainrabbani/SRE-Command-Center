@@ -26,3 +26,8 @@ export * from './phaseCriterion';
 export * from './phaseStatusResponse';
 export * from './remediationActionSummary';
 export * from './remediationActionSummaryExecutionResult';
+export * from './remediationDecisionRequest';
+export * from './remediationDecisionRequestDecision';
+export * from './validationErrorResponse';
+export * from './validationErrorResponseCode';
+export * from './validationIssue';

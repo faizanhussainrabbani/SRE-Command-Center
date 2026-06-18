@@ -156,11 +156,55 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/AccuracySummaryResponse"
+  /v1/remediation-actions/{actionId}/decision:
+    post:
+      operationId: submitRemediationDecision
+      tags: [incidents]
+      summary: Approve or reject a remediation action
+      description: >-
+        Submit an operator decision (approve or reject) for a pending
+        remediation action. Only actions with a pending approval status
+        can be decided. On success, the parent incident version is bumped
+        to trigger WebSocket updates.
+      parameters:
+        - $ref: "#/components/parameters/RemediationActionId"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RemediationDecisionRequest"
+      responses:
+        "200":
+          description: Updated remediation action after decision applied
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RemediationActionSummary"
+        "400":
+          description: Invalid request parameters or action not in decidable state
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ValidationErrorResponse"
+        "404":
+          description: Remediation action not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
 components:
   parameters:
     IncidentId:
       in: path
       name: id
+      required: true
+      schema:
+        type: string
+        format: uuid
+    RemediationActionId:
+      in: path
+      name: actionId
       required: true
       schema:
         type: string
@@ -565,4 +609,14 @@ components:
         - resyncToken
         - at
         - incident
-
+    RemediationDecisionRequest:
+      type: object
+      properties:
+        decision:
+          type: string
+          enum: [approve, reject]
+        reason:
+          type: string
+          nullable: true
+      required:
+        - decision

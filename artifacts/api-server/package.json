@@ -8,7 +8,7 @@
     "build": "node ./build.mjs",
     "start": "node --enable-source-maps ./dist/index.mjs",
     "typecheck": "tsc -p tsconfig.json --noEmit",
-    "test": "DATABASE_URL=${DATABASE_URL:-postgresql://sre_agent:sre_agent@localhost:5432/sre_agent} NODE_ENV=test tsx --test src/**/*.test.ts"
+    "test": "DATABASE_URL=${DATABASE_URL:-postgresql://test:test@localhost:5434/sre_demo} NODE_ENV=test tsx --test src/**/*.test.ts"
   },
   "dependencies": {
     "@workspace/api-zod": "workspace:*",

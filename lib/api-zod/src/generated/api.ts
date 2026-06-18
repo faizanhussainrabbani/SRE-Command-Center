@@ -190,3 +190,29 @@ export const GetAccuracySummaryResponse = zod.object({
 })
 
 
+/**
+ * Submit an operator decision (approve or reject) for a pending remediation action. Only actions with a pending approval status can be decided. On success, the parent incident version is bumped to trigger WebSocket updates.
+ * @summary Approve or reject a remediation action
+ */
+export const SubmitRemediationDecisionParams = zod.object({
+  "actionId": zod.coerce.string().uuid()
+})
+
+export const SubmitRemediationDecisionBody = zod.object({
+  "decision": zod.enum(['approve', 'reject']),
+  "reason": zod.string().nullish()
+})
+
+export const SubmitRemediationDecisionResponse = zod.object({
+  "actionId": zod.string().uuid(),
+  "actionType": zod.string(),
+  "actionStatus": zod.string(),
+  "approvalMode": zod.string(),
+  "requestedAt": zod.coerce.date(),
+  "startedAt": zod.coerce.date().nullable(),
+  "completedAt": zod.coerce.date().nullable(),
+  "rollbackActionId": zod.string().uuid().nullable(),
+  "executionResult": zod.record(zod.string(), zod.unknown()).nullable()
+})
+
+

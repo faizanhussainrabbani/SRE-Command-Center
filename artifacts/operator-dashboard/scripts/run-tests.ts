@@ -7,7 +7,9 @@ import { runIncidentDetailSuite } from "../src/test/incident-detail.test";
 import { runIncidentsFeedSuite } from "../src/test/incidents-feed.test";
 import { runIncidentsSuite } from "../src/test/incidents.test";
 import { runErrorAdapterSuite } from "../src/test/error-adapter.test";
+import { runPhaseGraduationSuite } from "../src/test/phase-graduation.test";
 import { runRealtimeSuite } from "../src/test/realtime.test";
+import { runRemediationActionsSuite } from "../src/test/remediation-actions.test";
 import { runRouteRenderingSuite } from "../src/test/route-rendering.test";
 
 type Suite = {
@@ -66,6 +68,16 @@ const suites: Suite[] = [
     name: "route-rendering",
     tags: ["routes", "render", "integration"],
     run: runRouteRenderingSuite,
+  },
+  {
+    name: "remediation-actions",
+    tags: ["remediation", "actions", "incidents"],
+    run: runRemediationActionsSuite,
+  },
+  {
+    name: "phase-graduation",
+    tags: ["phase", "graduation", "progress"],
+    run: runPhaseGraduationSuite,
   },
 ];
 

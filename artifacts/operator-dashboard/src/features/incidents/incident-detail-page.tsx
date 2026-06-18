@@ -1,6 +1,7 @@
 import { useGetIncidentById } from "@workspace/api-client-react";
 import { Link } from "wouter";
 import { selectIncidentDetailViewModel } from "@/features/incidents/selectors";
+import { RemediationActionsPanel } from "@/features/incidents/remediation-actions-panel";
 import { TimelinePanel } from "@/features/incidents/timeline-panel";
 import { Badge } from "@/shared/ui/badge";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/shared/ui/card";
@@ -93,7 +94,6 @@ export function IncidentDetailPage({ params }: IncidentDetailPageProps) {
                     Confidence: {detailView.latestDiagnosis.confidenceLabel} by {detailView.latestDiagnosis.modelName}
                   </p>
                   <p className="text-meta">Generated {detailView.latestDiagnosis.generatedAtLabel}</p>
-                  <p className="text-meta">Remediation actions linked: {detailView.remediationCount}</p>
                 </div>
               ) : (
                 <EmptyState
@@ -132,6 +132,11 @@ export function IncidentDetailPage({ params }: IncidentDetailPageProps) {
           </Card>
         </div>
       </div>
+
+      <RemediationActionsPanel
+        incidentId={incidentId}
+        actions={detailView.remediationActions}
+      />
     </section>
   );
 }

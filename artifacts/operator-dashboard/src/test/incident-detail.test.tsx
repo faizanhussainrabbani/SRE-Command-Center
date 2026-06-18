@@ -12,6 +12,16 @@ export async function runIncidentDetailSuite(): Promise<void> {
   assert.equal(detail.latestDiagnosis?.confidenceLabel, "89.0%");
   assert.equal(detail.remediationCount, 1);
 
+  // Verify remediationActions array is mapped (not just count)
+  assert.equal(detail.remediationActions.length, 1);
+  const action = detail.remediationActions[0];
+  assert.equal(action.actionId, "00000000-0000-4000-8000-000000000201");
+  assert.equal(action.actionTypeLabel, "Restart");
+  assert.equal(action.actionStatusLabel, "Pending");
+  assert.equal(action.approvalModeLabel, "Manual");
+  assert.equal(action.isDecidable, true);
+  assert.equal(action.hasRollback, false);
+
   const timeline = mapIncidentTimelineResponse(buildTimelineResponse());
   assert.equal(timeline.events.length, 2);
   assert.equal(timeline.events[0].eventType, "Incident Detected");

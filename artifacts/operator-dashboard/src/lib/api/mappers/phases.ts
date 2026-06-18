@@ -5,12 +5,14 @@ export type PhaseCriterionViewModel = {
   label: string;
   currentLabel: string;
   targetLabel: string;
+  progressPercent: number;
   status: "met" | "not_met";
 };
 
 export type PhaseStatusViewModel = {
   currentPhase: string;
   currentPhaseLabel: string;
+  phaseGateIndex: number;
   asOfLabel: string;
   graduationCriteria: PhaseCriterionViewModel[];
 };
@@ -24,14 +26,18 @@ export type AccuracySummaryViewModel = {
   mttrMinutesLabel: string;
 };
 
+const PHASE_GATE_ORDER = ["OBSERVE", "ASSIST", "AUTONOMOUS"];
+
 export function mapPhaseStatusResponse(response: PhaseStatusResponse): PhaseStatusViewModel {
   const currentPhase = asString((response as { currentPhase?: unknown }).currentPhase, "UNKNOWN");
   const criteria = asArray<PhaseCriterion>((response as { graduationCriteria?: unknown }).graduationCriteria)
     .map(mapPhaseCriterion);
+  const phaseGateIndex = PHASE_GATE_ORDER.indexOf(currentPhase.toUpperCase());
 
   return {
     currentPhase,
     currentPhaseLabel: normalizePhaseLabel(currentPhase),
+    phaseGateIndex: phaseGateIndex >= 0 ? phaseGateIndex : 0,
     asOfLabel: formatTimestamp(asString((response as { asOf?: unknown }).asOf, "")),
     graduationCriteria: criteria,
   };
@@ -53,11 +59,27 @@ export function mapAccuracySummaryResponse(response: AccuracySummaryResponse): A
 
 function mapPhaseCriterion(criterion: PhaseCriterion): PhaseCriterionViewModel {
   const unit = asString((criterion as { unit?: unknown }).unit, "count");
+  const current = asNumber((criterion as { current?: unknown }).current, 0);
+  const target = asNumber((criterion as { target?: unknown }).target, 0);
+  const isLowerBetter = unit === "count" && target === 0;
+
+  let progressPercent: number;
+  if (isLowerBetter) {
+    // For "lower is better" (e.g., destructive false positives target 0):
+    // 0 errors = 100%, any errors = 0%
+    progressPercent = current <= target ? 100 : 0;
+  } else if (target > 0) {
+    progressPercent = Math.min(100, Math.round((current / target) * 100));
+  } else {
+    progressPercent = 0;
+  }
+
   return {
     key: asString((criterion as { key?: unknown }).key, "unknown"),
     label: asString((criterion as { label?: unknown }).label, "Unknown criterion"),
-    currentLabel: formatCriterionValue(asNumber((criterion as { current?: unknown }).current, 0), unit),
-    targetLabel: formatCriterionValue(asNumber((criterion as { target?: unknown }).target, 0), unit),
+    currentLabel: formatCriterionValue(current, unit),
+    targetLabel: formatCriterionValue(target, unit),
+    progressPercent,
     status: criterion.status === "met" ? "met" : "not_met",
   };
 }
