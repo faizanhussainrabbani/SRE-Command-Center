@@ -110,12 +110,12 @@ export function IncidentFeedPage() {
             <CardContent>
               <div className="status-list">
                 <div className="status-item">
-                  <span className="status-item-label">Agent kill switch</span>
-                  <span className="status-item-value">Armed</span>
+                  <span className="status-item-label">Agent kill switch (static fallback)</span>
+                  <span className="status-item-value">Not sourced from the dashboard API</span>
                 </div>
                 <div className="status-item">
-                  <span className="status-item-label">Current phase gate</span>
-                  <span className="status-item-value">Assist</span>
+                  <span className="status-item-label">Current phase gate (static fallback)</span>
+                  <span className="status-item-value">Not sourced from the dashboard API</span>
                 </div>
                 <div className="status-item">
                   <span className="status-item-label">Feed stale state</span>

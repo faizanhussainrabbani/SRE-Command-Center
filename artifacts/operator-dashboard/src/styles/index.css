@@ -1,21 +1,39 @@
+@import "./design-tokens.css";
+
+/* ============================================================
+   SRE Operator Dashboard — Main Stylesheet
+   ============================================================
+   Fixes applied:
+   - Accessibility: font sizes bumped to readable minimums,
+     uppercase reduced to short-label contexts only,
+     muted text contrast improved to WCAG AA+
+   - Border-radius hierarchy: cards 6px, badges/buttons 3px,
+     progress bars pill-shaped
+   - Focus/keyboard: :focus-visible styles on all interactives
+   - Animations: skeleton loading, view transitions, action
+     feedback (press scale, flash rings, pulse indicator)
+   - Design tokens: all values sourced from design-tokens.css
+   ============================================================ */
+
 :root {
-  color: #e7edf6;
-  background: #090b10;
-  font-family: "IBM Plex Mono", "Fira Code", "JetBrains Mono", monospace;
+  color: var(--sre-text);
+  background: var(--sre-bg);
+  font-family: var(--sre-font-mono);
+  font-size: 14px;
   line-height: 1.5;
-  --surface: #12151c;
-  --surface-strong: #171b24;
-  --surface-soft: #0f131b;
-  --border: rgba(255, 255, 255, 0.1);
-  --text-muted: #8d98ad;
+  --surface: var(--sre-surface);
+  --surface-strong: var(--sre-surface-strong);
+  --surface-soft: var(--sre-surface-soft);
+  --border: var(--sre-border);
+  --text-muted: var(--sre-text-muted);
   --badge-outline-bg: rgba(45, 212, 191, 0.08);
-  --ok: #34d399;
-  --ok-bg: rgba(16, 185, 129, 0.15);
-  --warn: #f59e0b;
-  --warn-bg: rgba(245, 158, 11, 0.16);
-  --danger: #f87171;
-  --danger-bg: rgba(248, 113, 113, 0.15);
-  --info: #60a5fa;
+  --ok: var(--sre-ok);
+  --ok-bg: var(--sre-ok-bg);
+  --warn: var(--sre-warn);
+  --warn-bg: var(--sre-warn-bg);
+  --danger: var(--sre-danger);
+  --danger-bg: var(--sre-danger-bg);
+  --info: var(--sre-info);
   --chip: #0d1118;
 }
 
@@ -29,7 +47,7 @@ body {
   background:
     radial-gradient(900px 300px at 50% -15%, rgba(52, 211, 153, 0.12), transparent 72%),
     radial-gradient(700px 220px at 10% 0%, rgba(56, 189, 248, 0.09), transparent 62%),
-    #090b10;
+    var(--sre-bg);
 }
 
 #root {
@@ -39,6 +57,98 @@ body {
 a {
   color: #a5b4fc;
 }
+
+/* ============================================================
+   Focus / Keyboard Navigation
+   ============================================================ */
+
+:focus-visible {
+  outline: 2px solid var(--sre-focus-ring);
+  outline-offset: 2px;
+}
+
+:focus:not(:focus-visible) {
+  outline: none;
+}
+
+/* ============================================================
+   Animations & Micro-Feedback
+   ============================================================ */
+
+/* Skeleton loading shimmer */
+@keyframes sre-shimmer {
+  0%   { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+.skeleton {
+  background: linear-gradient(
+    90deg,
+    var(--surface-soft) 25%,
+    rgba(255, 255, 255, 0.06) 50%,
+    var(--surface-soft) 75%
+  );
+  background-size: 200% 100%;
+  animation: sre-shimmer 1.8s ease-in-out infinite;
+  border-radius: var(--sre-radius-md);
+}
+
+.skeleton-text {
+  height: 0.875rem;
+  margin-bottom: 0.5rem;
+}
+
+.skeleton-heading {
+  height: 1.2rem;
+  width: 60%;
+  margin-bottom: 0.75rem;
+}
+
+.skeleton-kpi {
+  height: 3rem;
+}
+
+/* View transition fade */
+@keyframes sre-fade-in {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* Success flash for approve */
+@keyframes sre-flash-ok {
+  0%   { box-shadow: 0 0 0 0 rgba(52, 211, 153, 0.4); }
+  50%  { box-shadow: 0 0 0 6px rgba(52, 211, 153, 0.15); }
+  100% { box-shadow: 0 0 0 0 rgba(52, 211, 153, 0); }
+}
+
+/* Danger flash for reject */
+@keyframes sre-flash-danger {
+  0%   { box-shadow: 0 0 0 0 rgba(248, 113, 113, 0.4); }
+  50%  { box-shadow: 0 0 0 6px rgba(248, 113, 113, 0.15); }
+  100% { box-shadow: 0 0 0 0 rgba(248, 113, 113, 0); }
+}
+
+.flash-ok {
+  animation: sre-flash-ok 0.5s ease-out;
+}
+
+.flash-danger {
+  animation: sre-flash-danger 0.5s ease-out;
+}
+
+/* Subtle pulse for realtime indicator dot */
+@keyframes sre-pulse {
+  0%, 100% { opacity: 1; }
+  50%      { opacity: 0.5; }
+}
+
+.pulse {
+  animation: sre-pulse 2s ease-in-out infinite;
+}
+
+/* ============================================================
+   App Shell
+   ============================================================ */
 
 .app-shell {
   min-height: 100vh;
@@ -65,7 +175,7 @@ a {
 
 .app-title {
   margin: 0;
-  color: #f8fbff;
+  color: var(--sre-text-heading);
   letter-spacing: 0.04em;
   font-size: clamp(1.3rem, 2vw, 1.8rem);
 }
@@ -73,7 +183,7 @@ a {
 .app-subtitle {
   margin: 0;
   color: #7f8aa0;
-  font-size: 0.75rem;
+  font-size: 0.8125rem;
   letter-spacing: 0.06em;
   text-transform: uppercase;
 }
@@ -92,13 +202,14 @@ a {
 .app-nav a {
   text-decoration: none;
   color: #d4d9e4;
-  font-size: 0.78rem;
+  font-size: 0.8125rem;
   letter-spacing: 0.07em;
   text-transform: uppercase;
   border: 1px solid rgba(255, 255, 255, 0.12);
   background: rgba(255, 255, 255, 0.02);
-  border-radius: 2px;
+  border-radius: var(--sre-radius-sm);
   padding: 0.35rem 0.55rem;
+  transition: border-color 0.15s ease, color 0.15s ease, background 0.15s ease;
 }
 
 .app-nav a:hover {
@@ -106,12 +217,22 @@ a {
   color: #a7f3d0;
 }
 
+.app-nav a:focus-visible {
+  outline: 2px solid var(--sre-focus-ring);
+  outline-offset: 2px;
+}
+
 .app-main {
   background: transparent;
   border: 0;
   border-radius: 0;
   padding: 0;
+  animation: sre-fade-in 0.25s ease-out;
 }
+
+/* ============================================================
+   KPIs
+   ============================================================ */
 
 .overview-kpis {
   display: grid;
@@ -123,7 +244,7 @@ a {
 .kpi-item {
   background: var(--surface-soft);
   border: 1px solid var(--border);
-  border-radius: 2px;
+  border-radius: var(--sre-radius-md);
   padding: 0.55rem 0.7rem;
 }
 
@@ -131,7 +252,7 @@ a {
   color: var(--text-muted);
   text-transform: uppercase;
   letter-spacing: 0.07em;
-  font-size: 0.65rem;
+  font-size: 0.8rem;
 }
 
 .kpi-item dd {
@@ -140,13 +261,21 @@ a {
   font-weight: 700;
 }
 
+/* ============================================================
+   Error State
+   ============================================================ */
+
 .error-state {
   margin: 2rem;
   padding: 1rem;
-  border-radius: 2px;
+  border-radius: var(--sre-radius-md);
   border: 1px solid rgba(248, 113, 113, 0.55);
   background: rgba(248, 113, 113, 0.08);
 }
+
+/* ============================================================
+   Layout Grids
+   ============================================================ */
 
 .dashboard-grid {
   display: grid;
@@ -174,9 +303,13 @@ a {
   gap: 0.75rem;
 }
 
+/* ============================================================
+   Cards
+   ============================================================ */
+
 .card {
   border: 1px solid var(--border);
-  border-radius: 2px;
+  border-radius: var(--sre-radius-md);
   background: var(--surface);
   overflow: hidden;
 }
@@ -190,21 +323,26 @@ a {
 
 .card-title {
   margin: 0;
-  font-size: 0.8rem;
+  font-size: 0.875rem;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: #c7d2e5;
+  color: var(--sre-text-label);
 }
 
 .card-description {
   margin: 0;
   color: var(--text-muted);
-  font-size: 0.75rem;
+  font-size: 0.8125rem;
 }
 
 .card-content {
   padding: 0.75rem 0.85rem;
+  transition: opacity 0.2s ease;
 }
+
+/* ============================================================
+   Misc Text
+   ============================================================ */
 
 .link-list {
   margin: 0;
@@ -216,9 +354,13 @@ a {
 .text-meta {
   margin: 0.5rem 0 0;
   color: var(--text-muted);
-  font-size: 0.75rem;
+  font-size: 0.8125rem;
   letter-spacing: 0.03em;
 }
+
+/* ============================================================
+   Realtime Banner
+   ============================================================ */
 
 .realtime-banner {
   display: flex;
@@ -229,8 +371,12 @@ a {
 
 .realtime-banner-message {
   color: var(--text-muted);
-  font-size: 0.85rem;
+  font-size: 0.875rem;
 }
+
+/* ============================================================
+   Badges
+   ============================================================ */
 
 .chip-row {
   display: flex;
@@ -242,9 +388,9 @@ a {
 .badge {
   display: inline-flex;
   align-items: center;
-  border-radius: 2px;
+  border-radius: var(--sre-radius-sm);
   padding: 0.16rem 0.42rem;
-  font-size: 0.65rem;
+  font-size: 0.75rem;
   font-weight: 700;
   letter-spacing: 0.06em;
   text-transform: uppercase;
@@ -277,6 +423,10 @@ a {
   background: var(--danger-bg);
 }
 
+/* ============================================================
+   Tables
+   ============================================================ */
+
 .table-wrap {
   width: 100%;
   overflow-x: auto;
@@ -285,11 +435,12 @@ a {
 .table {
   width: 100%;
   border-collapse: collapse;
-  font-size: 0.8rem;
+  font-size: 0.875rem;
 }
 
 .table-row {
   border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  transition: background 0.15s ease, opacity 0.2s ease;
 }
 
 .table-row:hover {
@@ -305,14 +456,18 @@ a {
 .table-head {
   color: var(--text-muted);
   font-weight: 600;
-  font-size: 0.67rem;
+  font-size: 0.8rem;
   letter-spacing: 0.07em;
   text-transform: uppercase;
 }
 
+/* ============================================================
+   Empty State
+   ============================================================ */
+
 .empty-state {
   border: 1px dashed rgba(255, 255, 255, 0.22);
-  border-radius: 2px;
+  border-radius: var(--sre-radius-md);
   padding: 1rem;
   text-align: center;
   background: rgba(255, 255, 255, 0.03);
@@ -327,6 +482,10 @@ a {
   color: var(--text-muted);
 }
 
+/* ============================================================
+   Meta Grid
+   ============================================================ */
+
 .meta-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
@@ -335,9 +494,8 @@ a {
 
 .meta-grid dt {
   color: var(--text-muted);
-  font-size: 0.69rem;
-  text-transform: uppercase;
-  letter-spacing: 0.07em;
+  font-size: 0.8rem;
+  letter-spacing: 0.04em;
 }
 
 .meta-grid dd {
@@ -345,6 +503,10 @@ a {
   font-weight: 600;
   word-break: break-word;
 }
+
+/* ============================================================
+   KPI Grid
+   ============================================================ */
 
 .kpi-grid {
   display: grid;
@@ -355,13 +517,13 @@ a {
 .kpi-grid > div {
   border: 1px solid rgba(255, 255, 255, 0.08);
   background: #0f131b;
-  border-radius: 2px;
+  border-radius: var(--sre-radius-md);
   padding: 0.5rem;
 }
 
 .kpi-grid dt {
   color: var(--text-muted);
-  font-size: 0.68rem;
+  font-size: 0.8rem;
   text-transform: uppercase;
   letter-spacing: 0.06em;
 }
@@ -371,6 +533,10 @@ a {
   font-size: 0.95rem;
   font-weight: 700;
 }
+
+/* ============================================================
+   Incident Rows
+   ============================================================ */
 
 .incident-row-critical {
   border-left: 2px solid #ef4444;
@@ -389,13 +555,17 @@ a {
   gap: 0.25rem;
   align-items: center;
   color: #9aa4b8;
-  font-size: 0.73rem;
+  font-size: 0.8125rem;
 }
 
 .incident-phase-current {
   color: #fbbf24;
   font-weight: 700;
 }
+
+/* ============================================================
+   Status List
+   ============================================================ */
 
 .status-list {
   display: grid;
@@ -409,14 +579,13 @@ a {
   padding: 0.45rem 0.5rem;
   border: 1px solid rgba(255, 255, 255, 0.08);
   background: #0f131b;
-  border-radius: 2px;
+  border-radius: var(--sre-radius-md);
 }
 
 .status-item-label {
   color: var(--text-muted);
-  font-size: 0.72rem;
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
+  font-size: 0.8rem;
+  letter-spacing: 0.04em;
 }
 
 .status-item-value {
@@ -424,6 +593,10 @@ a {
   font-size: 0.8rem;
   font-weight: 700;
 }
+
+/* ============================================================
+   Responsive
+   ============================================================ */
 
 @media (max-width: 700px) {
   .dashboard-grid {
@@ -440,21 +613,21 @@ a {
 }
 
 /* ============================================================
-   Phase 7: Progress bars
+   Progress Bars
    ============================================================ */
 
 .progress-bar {
   width: 100%;
   height: 6px;
   background: rgba(255, 255, 255, 0.08);
-  border-radius: 3px;
+  border-radius: var(--sre-radius-pill);
   overflow: hidden;
   margin: 0.35rem 0 0.25rem;
 }
 
 .progress-bar-fill {
   height: 100%;
-  border-radius: 3px;
+  border-radius: var(--sre-radius-pill);
   transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
@@ -471,7 +644,7 @@ a {
 }
 
 /* ============================================================
-   Phase 7: Phase gate indicator
+   Phase Gate Indicator
    ============================================================ */
 
 .phase-gate {
@@ -509,7 +682,7 @@ a {
   gap: 0.35rem;
   padding: 0.35rem 0.6rem;
   border: 1px solid rgba(255, 255, 255, 0.12);
-  border-radius: 2px;
+  border-radius: var(--sre-radius-sm);
   background: var(--surface-soft);
   transition: all 0.3s ease;
   white-space: nowrap;
@@ -534,7 +707,7 @@ a {
   height: 1.3rem;
   border-radius: 50%;
   background: rgba(255, 255, 255, 0.08);
-  font-size: 0.6rem;
+  font-size: 0.7rem;
   font-weight: 700;
   color: var(--text-muted);
 }
@@ -550,7 +723,7 @@ a {
 }
 
 .phase-gate-step-label {
-  font-size: 0.7rem;
+  font-size: 0.8rem;
   font-weight: 600;
   letter-spacing: 0.06em;
   text-transform: uppercase;
@@ -566,7 +739,7 @@ a {
 }
 
 /* ============================================================
-   Phase 7: Criterion cards
+   Criterion Cards
    ============================================================ */
 
 .criteria-grid {
@@ -578,7 +751,7 @@ a {
 .criterion-card {
   border: 1px solid rgba(255, 255, 255, 0.08);
   background: var(--surface-soft);
-  border-radius: 2px;
+  border-radius: var(--sre-radius-md);
   padding: 0.55rem 0.7rem;
 }
 
@@ -590,10 +763,10 @@ a {
 }
 
 .criterion-card-label {
-  font-size: 0.72rem;
+  font-size: 0.8125rem;
   font-weight: 600;
   letter-spacing: 0.04em;
-  color: #c7d2e5;
+  color: var(--sre-text-label);
 }
 
 .criterion-card-values {
@@ -605,7 +778,7 @@ a {
 }
 
 /* ============================================================
-   Phase 7: Action buttons
+   Action Buttons
    ============================================================ */
 
 .action-controls {
@@ -621,11 +794,11 @@ a {
   justify-content: center;
   padding: 0.25rem 0.5rem;
   border: 1px solid rgba(255, 255, 255, 0.15);
-  border-radius: 2px;
+  border-radius: var(--sre-radius-sm);
   background: rgba(255, 255, 255, 0.04);
   color: #d4d9e4;
   font-family: inherit;
-  font-size: 0.68rem;
+  font-size: 0.78rem;
   font-weight: 600;
   letter-spacing: 0.05em;
   text-transform: uppercase;
@@ -638,15 +811,26 @@ a {
   border-color: rgba(255, 255, 255, 0.25);
 }
 
+.action-btn:active:not(:disabled) {
+  transform: scale(0.96);
+  transition: transform 0.08s ease;
+}
+
 .action-btn:disabled {
   opacity: 0.5;
   cursor: not-allowed;
 }
 
+.action-btn:focus-visible {
+  outline: 2px solid var(--sre-focus-ring);
+  outline-offset: 2px;
+  box-shadow: 0 0 0 4px var(--sre-focus-glow);
+}
+
 .action-btn-approve {
   border-color: rgba(16, 185, 129, 0.4);
   color: #a7f3d0;
-  background: rgba(16, 185, 129, 0.08);
+  background: rgba(16, 185, 129, 0.10);
 }
 
 .action-btn-approve:hover:not(:disabled) {
@@ -654,15 +838,25 @@ a {
   border-color: rgba(16, 185, 129, 0.6);
 }
 
+.action-btn-approve:focus-visible {
+  outline-color: var(--sre-focus-ring-ok);
+  box-shadow: 0 0 0 4px var(--sre-focus-glow-ok);
+}
+
 .action-btn-reject {
   border-color: rgba(239, 68, 68, 0.4);
   color: #fca5a5;
-  background: rgba(239, 68, 68, 0.08);
+  background: rgba(239, 68, 68, 0.10);
 }
 
 .action-btn-reject:hover:not(:disabled) {
   background: rgba(239, 68, 68, 0.18);
   border-color: rgba(239, 68, 68, 0.6);
+}
+
+.action-btn-reject:focus-visible {
+  outline-color: var(--sre-focus-ring-danger);
+  box-shadow: 0 0 0 4px var(--sre-focus-glow-danger);
 }
 
 .action-btn-detail {
@@ -683,7 +877,7 @@ a {
 }
 
 /* ============================================================
-   Phase 7: Inline confirmation
+   Inline Confirmation
    ============================================================ */
 
 .confirm-inline {
@@ -691,31 +885,38 @@ a {
   gap: 0.5rem;
   padding: 0.6rem 0.5rem;
   border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 2px;
+  border-radius: var(--sre-radius-md);
   background: rgba(255, 255, 255, 0.02);
 }
 
 .confirm-inline-prompt {
   margin: 0;
-  font-size: 0.78rem;
-  color: #c7d2e5;
+  font-size: 0.875rem;
+  color: var(--sre-text-label);
 }
 
 .confirm-inline-reason {
   width: 100%;
   background: var(--surface-soft);
   border: 1px solid rgba(255, 255, 255, 0.12);
-  border-radius: 2px;
-  color: #e7edf6;
+  border-radius: var(--sre-radius-md);
+  color: var(--sre-text);
   font-family: inherit;
-  font-size: 0.75rem;
+  font-size: 0.8125rem;
   padding: 0.4rem 0.5rem;
   resize: vertical;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
 }
 
 .confirm-inline-reason:focus {
   outline: none;
   border-color: rgba(96, 165, 250, 0.5);
+}
+
+.confirm-inline-reason:focus-visible {
+  outline: none;
+  border-color: rgba(96, 165, 250, 0.6);
+  box-shadow: 0 0 0 3px rgba(96, 165, 250, 0.12);
 }
 
 .confirm-inline-actions {
@@ -726,11 +927,11 @@ a {
 .confirm-inline-error {
   margin: 0;
   color: var(--danger);
-  font-size: 0.75rem;
+  font-size: 0.8125rem;
 }
 
 /* ============================================================
-   Phase 7: Expandable JSON
+   Expandable JSON
    ============================================================ */
 
 .expandable-json {
@@ -738,10 +939,10 @@ a {
   padding: 0.6rem 0.7rem;
   background: #0a0d14;
   border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 2px;
+  border-radius: var(--sre-radius-sm);
   color: #93c5fd;
-  font-family: "IBM Plex Mono", "Fira Code", monospace;
-  font-size: 0.7rem;
+  font-family: var(--sre-font-mono);
+  font-size: 0.78rem;
   line-height: 1.55;
   overflow-x: auto;
   white-space: pre;

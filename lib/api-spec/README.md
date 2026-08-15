@@ -19,6 +19,8 @@ The SRE Command Center contract artifacts publish both REST and realtime interfa
 * OpenAPI source: [openapi.yaml](openapi.yaml)
 * Async websocket companion: [asyncapi-incidents.yaml](asyncapi-incidents.yaml)
 
+Treat these artifacts as the published contract surface for the current dashboard transport.
+
 ## REST Contract
 
 The OpenAPI contract defines Node API endpoints under /api, including:
@@ -36,6 +38,8 @@ The websocket stream contract documents the dashboard realtime endpoint:
 * Endpoint: /api/ws/incidents
 * Messages: initial_state and incident_update
 * Reconciliation fields: sequence and resyncToken
+
+The OpenAPI file publishes the websocket reference metadata, and the AsyncAPI file carries the message schema detail.
 
 Use the AsyncAPI contract for frontend reconnect and reconciliation acceptance tests.
 

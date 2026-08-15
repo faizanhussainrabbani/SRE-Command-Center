@@ -16,6 +16,7 @@ tags:
     description: Dashboard summary operations
 x-websocket-contracts:
   incidents:
+    description: Stable websocket contract surface for the current incident stream transport.
     endpoint: /api/ws/incidents
     protocol: ws
     asyncapi: ./asyncapi-incidents.yaml

@@ -116,16 +116,16 @@ export function IncidentDetailPage({ params }: IncidentDetailPageProps) {
             <CardContent>
               <div className="status-list">
                 <div className="status-item">
-                  <span className="status-item-label">Manual approval mode</span>
-                  <span className="status-item-value">Enabled</span>
+                  <span className="status-item-label">Manual approval mode (static fallback)</span>
+                  <span className="status-item-value">Not sourced from the dashboard API</span>
                 </div>
                 <div className="status-item">
-                  <span className="status-item-label">Blast radius</span>
-                  <span className="status-item-value">Low</span>
+                  <span className="status-item-label">Blast radius (static fallback)</span>
+                  <span className="status-item-value">Not sourced from the dashboard API</span>
                 </div>
                 <div className="status-item">
-                  <span className="status-item-label">Rollback readiness</span>
-                  <span className="status-item-value">Ready</span>
+                  <span className="status-item-label">Rollback readiness (static fallback)</span>
+                  <span className="status-item-value">Not sourced from the dashboard API</span>
                 </div>
               </div>
             </CardContent>

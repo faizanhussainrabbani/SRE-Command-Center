@@ -77,6 +77,15 @@ export async function runRealtimeSuite(): Promise<void> {
   );
   assert.equal(
     getRealtimeConnectionLabel({
+      connection: "recovering",
+      attempt: 1,
+      stale: false,
+      message: null,
+    }),
+    "Recovering missed updates",
+  );
+  assert.equal(
+    getRealtimeConnectionLabel({
       connection: "connected",
       attempt: 0,
       stale: true,

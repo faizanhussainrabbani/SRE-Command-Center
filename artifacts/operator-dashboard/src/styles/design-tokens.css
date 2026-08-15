@@ -1,0 +1,51 @@
+/* ============================================================
+   SRE Command Center — Shared Design Tokens
+   ============================================================
+   Canonical design values consumed by both the operator
+   dashboard and the mockup sandbox. Import this file in each
+   UI's entry stylesheet to keep both surfaces in sync.
+   ============================================================ */
+
+:root {
+  /* ---- Semantic Status Colors ---- */
+  --sre-ok: #34d399;
+  --sre-ok-bg: rgba(16, 185, 129, 0.18);
+  --sre-warn: #fbbf24;
+  --sre-warn-bg: rgba(245, 158, 11, 0.20);
+  --sre-danger: #fca5a5;
+  --sre-danger-bg: rgba(248, 113, 113, 0.18);
+  --sre-info: #60a5fa;
+
+  /* ---- Surface Palette ---- */
+  --sre-bg: #090b10;
+  --sre-surface: #12151c;
+  --sre-surface-strong: #171b24;
+  --sre-surface-soft: #0f131b;
+
+  /* ---- Text ---- */
+  --sre-text: #e7edf6;
+  --sre-text-muted: #a3afc4;           /* Brightened for WCAG AA+ on --sre-bg */
+  --sre-text-heading: #f8fbff;
+  --sre-text-label: #c7d2e5;
+
+  /* ---- Border ---- */
+  --sre-border: rgba(255, 255, 255, 0.1);
+
+  /* ---- Radius Scale ---- */
+  --sre-radius-sm: 3px;
+  --sre-radius-md: 6px;
+  --sre-radius-lg: 8px;
+  --sre-radius-pill: 9999px;
+
+  /* ---- Font Stacks ---- */
+  --sre-font-mono: "IBM Plex Mono", "Fira Code", "JetBrains Mono", monospace;
+  --sre-font-sans: "Inter", system-ui, -apple-system, sans-serif;
+
+  /* ---- Focus Ring ---- */
+  --sre-focus-ring: rgba(96, 165, 250, 0.7);
+  --sre-focus-glow: rgba(96, 165, 250, 0.15);
+  --sre-focus-ring-ok: rgba(52, 211, 153, 0.7);
+  --sre-focus-glow-ok: rgba(52, 211, 153, 0.15);
+  --sre-focus-ring-danger: rgba(248, 113, 113, 0.7);
+  --sre-focus-glow-danger: rgba(248, 113, 113, 0.15);
+}

@@ -11,7 +11,8 @@ import type { Server } from "node:http";
 import { WebSocket, WebSocketServer } from "ws";
 import { logger } from "../lib/logger";
 
-const INCIDENTS_WS_PATH = "/api/ws/incidents";
+export const INCIDENTS_WS_PATH = "/api/ws/incidents";
+export const INCIDENT_STREAM_MESSAGE_TYPES = ["initial_state", "incident_update"] as const;
 const DEFAULT_POLL_INTERVAL_MS = 750;
 const MAX_SNAPSHOT_SIZE = 200;
 
@@ -165,7 +166,7 @@ async function fetchIncidentSummaries(): Promise<IncidentSummary[]> {
     .limit(MAX_SNAPSHOT_SIZE);
 
   const items = await Promise.all(incidents.map((incident) => toIncidentSummary(incident)));
-  // Reuse the generated REST incident schema so websocket payloads stay contract-aligned.
+  // Reuse the generated REST incident schema so websocket payloads stay aligned with the published websocket contract.
   return ListIncidentsResponse.shape.items.parse(items);
 }
 
