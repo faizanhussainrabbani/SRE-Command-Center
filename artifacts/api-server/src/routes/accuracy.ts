@@ -45,7 +45,7 @@ router.get("/v1/accuracy/summary", async (_req, res) => {
         sql<boolean>`exists (
           select 1 from remediation_actions ra
           where ra.incident_id = ${incidentsTable.incidentId}
-          and lower(ra.approval_mode) = 'autonomous'
+          and lower(ra.approval_mode) in ('auto', 'autonomous')
           and lower(ra.action_status) in ('completed', 'succeeded', 'resolved')
         )`,
       ),
@@ -59,8 +59,8 @@ router.get("/v1/accuracy/summary", async (_req, res) => {
     .where(
       and(
         gte(remediationActionsTable.requestedAt, operationalWindowStart),
-        sql<boolean>`lower(${remediationActionsTable.approvalMode}) in ('manual', 'human', 'approval_required')`,
-        sql<boolean>`lower(${remediationActionsTable.actionStatus}) in ('pending', 'requested', 'awaiting_approval')`,
+        sql<boolean>`lower(${remediationActionsTable.approvalMode}) in ('human', 'manual', 'approval_required')`,
+        sql<boolean>`lower(${remediationActionsTable.actionStatus}) in ('planned', 'pending', 'requested', 'awaiting_approval')`,
       ),
     );
 

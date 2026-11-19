@@ -51,8 +51,8 @@ router.get("/v1/phases/status", async (_req, res) => {
     .where(
       and(
         gte(remediationActionsTable.requestedAt, windowStart),
-        eqText(remediationActionsTable.approvalMode, "autonomous"),
-        eqText(remediationActionsTable.actionStatus, "failed"),
+        sql<boolean>`lower(${remediationActionsTable.approvalMode}) in ('auto', 'autonomous')`,
+        sql<boolean>`lower(${remediationActionsTable.actionStatus}) in ('failed', 'rolled_back')`,
       ),
     );
 
@@ -63,7 +63,7 @@ router.get("/v1/phases/status", async (_req, res) => {
         where exists (
           select 1 from remediation_actions ra
           where ra.incident_id = ${incidentsTable.incidentId}
-          and lower(ra.approval_mode) = 'autonomous'
+          and lower(ra.approval_mode) in ('auto', 'autonomous')
           and lower(ra.action_status) in ('completed', 'succeeded', 'resolved')
         )
       )`,
@@ -73,7 +73,7 @@ router.get("/v1/phases/status", async (_req, res) => {
       and(
         gte(incidentsTable.updatedAt, windowStart),
         inArray(incidentsTable.status, ["resolved", "closed"]),
-        inArray(incidentsTable.severity, ["SEV3", "SEV4"]),
+        sql<boolean>`upper(${incidentsTable.severity}) in ('SEV3', 'SEV4')`,
       ),
     );
 
@@ -171,9 +171,5 @@ router.get("/v1/phases/status", async (_req, res) => {
     graduationCriteria,
   });
 });
-
-function eqText(column: { name: string }, value: string) {
-  return sql<boolean>`lower(${column}) = ${value.toLowerCase()}`;
-}
 
 export default router;

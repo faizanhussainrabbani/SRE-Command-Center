@@ -231,12 +231,18 @@ function statusVariant(status: string): "default" | "ok" | "warn" | "danger" | "
     case "resolved":
     case "approved":
       return "ok";
+    case "planned":
     case "pending":
     case "requested":
     case "awaiting_approval":
+    case "running":
+    case "executing":
+    case "verifying":
       return "warn";
     case "failed":
     case "rejected":
+    case "cancelled":
+    case "rolled_back":
       return "danger";
     default:
       return "default";

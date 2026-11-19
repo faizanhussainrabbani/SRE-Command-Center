@@ -1,8 +1,8 @@
 import { defineConfig } from "drizzle-kit";
 import path from "path";
-import { ensureCanonicalDatabaseUrl } from "./src/database-url";
+import { validateDatabaseUrl } from "./src/database-url";
 
-const databaseUrl = ensureCanonicalDatabaseUrl(process.env.DATABASE_URL);
+const databaseUrl = validateDatabaseUrl(process.env.DATABASE_URL);
 
 export default defineConfig({
   schema: path.join(__dirname, "./src/schema/index.ts"),

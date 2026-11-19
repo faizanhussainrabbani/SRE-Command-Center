@@ -148,7 +148,7 @@ export function mapIncidentTimelineEvent(event: IncidentTimelineEvent): Incident
   };
 }
 
-const DECIDABLE_STATUSES = new Set(["pending", "requested", "awaiting_approval"]);
+const DECIDABLE_STATUSES = new Set(["planned", "pending", "requested", "awaiting_approval"]);
 
 export function mapRemediationAction(action: RemediationActionSummary): RemediationActionViewModel {
   const normalizedStatus = (action.actionStatus ?? "").toLowerCase();

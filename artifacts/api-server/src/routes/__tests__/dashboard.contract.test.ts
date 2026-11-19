@@ -38,7 +38,8 @@ let originalSelect: typeof db.select | null = null;
 
 before(async () => {
   originalSelect = db.select;
-  (db as typeof db & { select: typeof db.select }).select = buildSelect as typeof db.select;
+  (db as typeof db & { select: typeof db.select }).select =
+    buildSelect as unknown as typeof db.select;
 
   await new Promise<void>((resolve, reject) => {
     const server = app.listen(0, "127.0.0.1", () => {

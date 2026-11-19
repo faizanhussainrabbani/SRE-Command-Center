@@ -115,4 +115,29 @@ export async function runRemediationActionsSuite(): Promise<void> {
 
   const mappedFailed = mapRemediationAction(failedAction);
   assert.equal(mappedFailed.isDecidable, false);
+
+  // Test: canonical Python DB status "planned" IS decidable
+  const plannedAction: RemediationActionSummary = {
+    ...pendingAction,
+    actionId: "act-008",
+    actionStatus: "planned",
+    approvalMode: "human",
+  };
+
+  const mappedPlanned = mapRemediationAction(plannedAction);
+  assert.equal(mappedPlanned.isDecidable, true);
+  assert.equal(mappedPlanned.actionStatusLabel, "Planned");
+  assert.equal(mappedPlanned.approvalModeLabel, "Human");
+
+  // Test: canonical DB statuses "cancelled", "executing", "verifying", "rolled_back" are NOT decidable
+  for (const status of ["cancelled", "executing", "verifying", "rolled_back"]) {
+    const mappedTerminal = mapRemediationAction({
+      ...pendingAction,
+      actionId: `act-${status}`,
+      actionStatus: status,
+      approvalMode: "auto",
+    });
+    assert.equal(mappedTerminal.isDecidable, false, `${status} should not be decidable`);
+    assert.equal(mappedTerminal.approvalModeLabel, "Auto");
+  }
 }

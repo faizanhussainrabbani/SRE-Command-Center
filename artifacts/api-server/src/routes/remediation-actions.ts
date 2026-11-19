@@ -16,7 +16,9 @@ import { logger } from "../lib/logger";
 
 const router: IRouter = Router();
 
-const DECIDABLE_STATUSES = ["pending", "requested", "awaiting_approval"];
+// Canonical Python DB status is "planned" (migration 007 CHECK constraint);
+// legacy aliases remain accepted for backwards compatibility.
+const DECIDABLE_STATUSES = ["planned", "pending", "requested", "awaiting_approval"];
 
 router.post("/v1/remediation-actions/:actionId/decision", async (req, res) => {
   const params = parseOrSendValidationError(
@@ -68,13 +70,28 @@ router.post("/v1/remediation-actions/:actionId/decision", async (req, res) => {
 
   const now = new Date();
   const isApprove = body.decision === "approve";
-  const newStatus = isApprove ? "approved" : "rejected";
+  // PostgreSQL chk_action_status allows:
+  // planned, approved, running, executing, verifying, completed, failed, cancelled, rolled_back.
+  // Human rejection persists as terminal "cancelled" with decision metadata in execution_result.
+  const newStatus = isApprove ? "approved" : "cancelled";
+
+  const existingExecutionResult =
+    action.executionResult && typeof action.executionResult === "object"
+      ? action.executionResult
+      : {};
+  const nextExecutionResult: Record<string, unknown> = {
+    ...existingExecutionResult,
+    decision: body.decision,
+    decidedAt: now.toISOString(),
+    ...(body.reason ? { reason: body.reason } : {}),
+  };
 
   await db
     .update(remediationActionsTable)
     .set({
       actionStatus: newStatus,
-      ...(isApprove ? { startedAt: now } : {}),
+      executionResult: nextExecutionResult,
+      ...(isApprove ? { startedAt: now } : { completedAt: now }),
     })
     .where(eq(remediationActionsTable.actionId, params.actionId));
 
